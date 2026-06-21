@@ -1,10 +1,25 @@
+import { useLocation } from "react-router-dom";
 function Navbar() {
+  const location = useLocation();
+  let pageTitle = "Dashboard";
+
+if (location.pathname === "/upload") {
+  pageTitle = "Upload";
+}
+
+if (location.pathname === "/reports") {
+  pageTitle = "Reports";
+}
+
+if (location.pathname === "/analytics") {
+  pageTitle = "Analytics";
+}
   return (
     <div
       style={{
         height: "70px",
         background: "rgba(255,255,255,0.8)",
-        backdropFilter: "Blur(8px)",
+        backdropFilter: "blur(8px)",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -12,7 +27,7 @@ function Navbar() {
         borderBottom: "1px solid #ddd",
       }}
     >
-      <h2>Dashboard</h2>
+      <h2>{pageTitle}</h2>
 
       <div
         style={{
@@ -23,8 +38,8 @@ function Navbar() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color:"while",
-          fontweight:"bold",
+          color:"white",
+          fontWeight:"bold",
         }}
       >
         M

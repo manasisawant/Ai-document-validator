@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
   FiHome,
   FiUpload,
@@ -18,7 +19,7 @@ function Sidebar() {
         flexDirection: "column",
       }}
     >
-      <h2 style={{ marginBottom: "40px", color: "white"}}>
+      <h2 style={{ marginBottom: "40px" }}>
         AI Validator
       </h2>
 
@@ -31,66 +32,73 @@ function Sidebar() {
           gap: "20px",
         }}
       >
-        <li style={menuStyle}
-        onMouseOver={(e) =>
-        (e.target.style.background = "#374151")
-        }
-        onMouseOut={(e) =>
-        (e.target.style.background = "#1f2937")
-        }
-        >
-          <FiHome />
-          Dashboard
-        </li>
-        <li style={menuStyle}
-        onMouseOver={(e) =>
-          (e.target.style.background = "#374151")
-        }
-        onMouseOut={(e) =>
-        (e.target.style.background = "#1f2937")
-        }
-        >
-          <FiUpload />
-          Upload
-        </li>
-        <li style={menuStyle}
-        onMouseOver={(e) =>
-        (e.target.style.background = "#374151")
-        }
-        onMouseOut={(e) =>
-        (e.target.style.background ="#1f2937")
-        }
-      >
-        <FiFileText />
-        Reports
-        </li>
-        <li 
-        style={menuStyle}
-        onMouseOver={(e) =>
-        (e.target.style.background = "#374151")
-        }
-        onMouseOut={(e) =>
-        (e.target.style.background = "#1f2937")
-        }
-        >
-          <FiBarChart2 />
-          Analytics
-          </li>
+        <MenuItem
+          to="/dashboard"
+          icon={<FiHome />}
+          text="Dashboard"
+        />
+
+        <MenuItem
+          to="/upload"
+          icon={<FiUpload />}
+          text="Upload"
+        />
+
+        <MenuItem
+          to="/reports"
+          icon={<FiFileText />}
+          text="Reports"
+        />
+
+        <MenuItem
+          to="/analytics"
+          icon={<FiBarChart2 />}
+          text="Analytics"
+        />
       </ul>
     </div>
   );
 }
 
+function MenuItem({ to, icon, text }) {
+  return (
+    <li
+      style={menuStyle}
+      onMouseOver={(e) =>
+        (e.currentTarget.style.background = "#374151")
+      }
+      onMouseOut={(e) =>
+        (e.currentTarget.style.background = "#1f2937")
+      }
+    >
+      <Link
+        to={to}
+        style={{
+          textDecoration: "none",
+          color: "white",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        {icon}
+        <span>{text}</span>
+      </Link>
+    </li>
+  );
+}
+
 const menuStyle = {
   padding: "16px",
-  borderRadius: "8px",
+  borderRadius: "10px",
   cursor: "pointer",
-  background: "#2563eb",
+  background: "#1f2937",
   transition: "0.3s",
   display: "flex",
   alignItems: "center",
-  gap: "12px",
-  boxShadow: "4px 0 20px rgba(0,0,0,0.2)",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
 };
 
 export default Sidebar;
