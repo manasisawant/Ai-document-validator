@@ -1,4 +1,11 @@
+import { useState, useRef } from "react";
 function UploadPage() {
+
+  const [pdfFile, setPdFile] = useState(null);
+  const [excelFile , setExcelFile] = useState(null);
+  const pdfInputRef = useRef(null);
+  const excelInputRef = useRef(null);
+
   return (
     <div style={{ width: "100%" }}>
       <h1
@@ -57,9 +64,31 @@ function UploadPage() {
               onMouseOut={(e) => {
                 e.target.style.background = "#2563eb";
               }}
+              onClick={() => pdfInputRef.current.click()}
             >
               Upload PDF
             </button>
+
+            <input
+            ref={pdfInputRef}
+            type="file"
+            accept=".pdf"
+            style={{ display: "none "}}
+            onChange={(e) => {
+              setPdFile(e.target.files[0]);
+            }}
+            />
+            {pdfFile && (
+  <p
+    style={{
+      marginTop: "15px",
+      color: "#2563eb",
+      fontWeight: "600",
+    }}
+  >
+    📄 {pdfFile.name}
+  </p>
+)}
           </div>
 
           {/* EXCEL CARD */}
@@ -74,6 +103,7 @@ function UploadPage() {
 
             <button
               style={excelButtonStyle}
+              onClick={() => excelInputRef.current.click()}
               onMouseOver={(e) => {
                 e.target.style.background = "#047857";
               }}
@@ -82,6 +112,33 @@ function UploadPage() {
               }}
             >
               Upload Excel
+
+              <input
+              ref={excelInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              style={{ display: "none"}}
+              onChange={(e) => {
+                setExcelFile(e.target.files[0]);
+              }}
+              />
+              {excelFile && (
+  <p
+    style={{
+      marginTop: "15px",
+      color: "#f3f4fa",
+      fontWeight: "600",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      maxWidth: "220px",
+      marginLeft: "auto",
+      marginRight: "auto",
+    }}
+  >
+    📊 {excelFile.name}
+  </p>
+)}
             </button>
           </div>
         </div>
@@ -93,7 +150,12 @@ function UploadPage() {
           }}
         >
           <button
-            style={validateButtonStyle}
+            style={{
+  ...validateButtonStyle,
+  background: !pdfFile || !excelFile ? "#9ca3af" : "#111827",
+  cursor: !pdfFile || !excelFile ? "not-allowed" : "pointer",
+}}
+            disabled={!pdfFile || !excelFile}
             onMouseOver={(e) => {
               e.target.style.background = "#1f2937";
             }}
@@ -116,6 +178,7 @@ const cardStyle = {
   padding: "35px",
   textAlign: "center",
   border: "1px solid #e5e7eb",
+  minHeight: "320px",
 };
 
 const iconStyle = {
