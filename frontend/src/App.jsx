@@ -17,7 +17,7 @@ function App() {
     <div
       style={{
         display: "flex",
-        background: "linear-gradient(135deg, #e0eafc, #cfdef3)",
+        background: "linear-gradient(135deg, #d8e6f7, #edf3fb, #dce7f5)",
         minHeight: "100vh",
         maxWidth: "1200px",
         margin: "0 auto",
@@ -33,7 +33,7 @@ function App() {
           <Routes>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/upload" element={<uploadPage />} />
+          <Route path="/upload" element={<UploadPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           </Routes>
