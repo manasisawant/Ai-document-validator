@@ -1,4 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function ReportsPage() {
   const location = useLocation();
@@ -8,42 +10,120 @@ function ReportsPage() {
   const hasMismatches = validationResult?.mismatches_count > 0;
 
   const downloadReport = () => {
-  let report = "AI DOCUMENT VALIDATION REPORT\n";
-  report += "====================================\n\n";
+  const doc = new jsPDF();
 
-  report += `Accuracy: ${validationResult.accuracy}%\n`;
-  report += `Matched Fields: ${validationResult.matched_count}\n`;
-  report += `Mismatches: ${validationResult.mismatches_count}\n`;
-  report += `Processing Time: ${validationResult.processing_time}\n\n`;
+  // Title
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text("AI DOCUMENT VALIDATION REPORT", 20, 20);
 
-  report += "COMPARISON DETAILS\n";
-  report += "====================================\n\n";
+  // Subtitle
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    "PDF and Excel Document Comparison",
+    20,
+    28
+  );
 
-  validationResult.comparison_results?.forEach((result) => {
-    report += `Field: ${result.field}\n`;
-    report += `PDF Value: ${result.pdf_value}\n`;
-    report += `Excel Value: ${result.excel_value}\n`;
-    report += `Status: ${result.status}\n`;
-    report += "------------------------------------\n";
+  // Line
+  doc.setDrawColor(200, 200, 200);
+  doc.line(20, 33, 190, 33);
+
+  // Summary heading
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Validation Summary", 20, 45);
+
+  // Summary details
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+
+  doc.text(
+    `Accuracy: ${validationResult.accuracy}%`,
+    20,
+    55
+  );
+
+  doc.text(
+    `Matched Fields: ${validationResult.matched_count}`,
+    20,
+    63
+  );
+
+  doc.text(
+    `Mismatches: ${validationResult.mismatches_count}`,
+    20,
+    71
+  );
+
+  doc.text(
+    `Processing Time: ${validationResult.processing_time}`,
+    20,
+    79
+  );
+
+  // Comparison heading
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Comparison Details", 20, 92);
+
+  // Comparison table
+  autoTable(doc, {
+    startY: 98,
+
+    head: [
+      [
+        "Field",
+        "PDF Value",
+        "Excel Value",
+        "Status"
+      ]
+    ],
+
+    body:
+      validationResult.comparison_results?.map(
+        (result) => [
+          result.field,
+          result.pdf_value,
+          result.excel_value,
+          result.status
+        ]
+      ) || [],
+
+    styles: {
+      fontSize: 9,
+      cellPadding: 4
+    },
+
+    headStyles: {
+      fontStyle: "bold"
+    },
+
+    alternateRowStyles: {
+      fillColor: [245, 247, 250]
+    }
   });
 
-  const blob = new Blob([report], {
-    type: "text/plain",
-  });
+  // Footer
+  const pageCount = doc.internal.getNumberOfPages();
 
-  const url = URL.createObjectURL(blob);
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
 
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "validation-report.txt";
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    doc.text(
+      `AI Document Validator | Page ${i} of ${pageCount}`,
+      20,
+      285
+    );
+  }
 
-  URL.revokeObjectURL(url);
+  // Download PDF
+  doc.save("AI-Document-Validation-Report.pdf");
 };
-
   if (!validationResult) {
     return (
       <div style={emptyStyle}>
