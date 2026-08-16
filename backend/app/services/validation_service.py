@@ -1,5 +1,6 @@
 import time
 
+
 def validate_document(pdf_text, excel_data):
 
     start_time = time.time()
@@ -9,16 +10,21 @@ def validate_document(pdf_text, excel_data):
     matched_count = 0
     mismatches_count = 0
 
-    expected_data = excel_data[0]
+    # Excel contains rows like:
+    # {"Field": "Invoice Number", "Value": "INV001"}
+    # {"Field": "Customer Name", "Value": "Rahul Sharma"}
+    # {"Field": "Amount", "Value": 5500}
 
-    for field, excel_value in expected_data.items():
+    for row in excel_data:
 
-        excel_value = str(excel_value).strip()
+        field = str(row.get("Field", "")).strip()
+        excel_value = str(row.get("Value", "")).strip()
 
         # Handle pandas datetime values
         if "00:00:00" in excel_value:
             excel_value = excel_value.split(" ")[0]
 
+        # Check whether the Excel value exists in the PDF text
         if excel_value.lower() in pdf_text.lower():
 
             comparison_results.append({

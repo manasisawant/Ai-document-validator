@@ -1,9 +1,12 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 function UploadPage() {
+  const navigate = useNavigate();
 
   const [pdfFile, setPdFile] = useState(null);
   const [excelFile , setExcelFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [validationResult, setValidationResult] = useState(null);
   const handleValidate = async () => {
   if (!pdfFile || !excelFile) {
     alert("Please upload both PDF and Excel files.");
@@ -24,7 +27,15 @@ function UploadPage() {
 
   const data = await response.json();
 
-  console.log("Validation Result:", data);
+  console.log("Validation Result:",data);
+
+  if(data.status === "success") {
+    navigate("/reports", {
+      state: {
+        validationResult: data,
+      },
+    });
+  }
 
 } catch (error) {
   console.error("Error:", error);
@@ -201,6 +212,8 @@ function UploadPage() {
     </div>
   );
 }
+
+
 
 const cardStyle = {
   flex: 1,
