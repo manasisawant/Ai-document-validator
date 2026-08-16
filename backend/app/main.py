@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 import shutil
 import os
@@ -14,6 +15,14 @@ app = FastAPI(
     title="AI Document Validator",
     description="Validate PDF documents against Excel data",
     version="1.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Create Upload Directories

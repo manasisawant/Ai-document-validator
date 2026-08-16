@@ -3,6 +3,36 @@ function UploadPage() {
 
   const [pdfFile, setPdFile] = useState(null);
   const [excelFile , setExcelFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleValidate = async () => {
+  if (!pdfFile || !excelFile) {
+    alert("Please upload both PDF and Excel files.");
+    return;
+  }
+
+  setLoading(true);
+
+  const formData = new FormData();
+  formData.append("pdf_file", pdfFile);
+  formData.append("excel_file", excelFile);
+
+  try {
+  const response = await fetch("http://127.0.0.1:8000/validate", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  console.log("Validation Result:", data);
+
+} catch (error) {
+  console.error("Error:", error);
+} finally {
+  setLoading(false);
+}
+
+};
   const pdfInputRef = useRef(null);
   const excelInputRef = useRef(null);
 
@@ -156,6 +186,7 @@ function UploadPage() {
   cursor: !pdfFile || !excelFile ? "not-allowed" : "pointer",
 }}
             disabled={!pdfFile || !excelFile}
+            onClick={handleValidate}
             onMouseOver={(e) => {
               e.target.style.background = "#1f2937";
             }}
