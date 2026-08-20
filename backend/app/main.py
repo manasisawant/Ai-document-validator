@@ -3,8 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 import shutil
 import os
+import json
 
 from app.database.connection import engine
+from app.database.base import Base
+from app.models.validation_history import ValidationHistory
+
 from app.services.pdf_service import extract_text_from_pdf
 from app.services.excel_service import read_excel
 from app.services.validation_service import validate_document
@@ -16,10 +20,15 @@ app = FastAPI(
     description="Validate PDF documents against Excel data",
     version="1.0"
 )
+ # Create Database Tables
+Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -168,4 +177,173 @@ async def validate_files(
         excel_data
     )
 
+    # Save validation result to database
+    with engine.connect() as connection:
+
+        connection.execute(
+            text("""
+                INSERT INTO validation_history
+                (
+                    pdf_filename,
+                    excel_filename,
+                    accuracy,
+                    matched_count,
+                    mismatches_count,
+                    processing_time,
+                    status,
+                    comparison_results
+                )
+                VALUES
+                (
+                    :pdf_filename,
+                    :excel_filename,
+                    :accuracy,
+                    :matched_count,
+                    :mismatches_count,
+                    :processing_time,
+                    :status,
+                    :comparison_results
+                )
+            """),
+            {
+                "pdf_filename": pdf_file.filename,
+                "excel_filename": excel_file.filename,
+                "accuracy": validation_result["accuracy"],
+                "matched_count": validation_result["matched_count"],
+                "mismatches_count": validation_result["mismatches_count"],
+                "processing_time": validation_result["processing_time"],
+                "status": validation_result["status"],
+                "comparison_results": json.dumps(
+                     validation_result["comparison_results"]
+                )
+            }
+        )
+
+        connection.commit()
+
     return validation_result
+
+# Get Validation History
+
+@app.get("/validation-history")
+def get_validation_history():
+
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT
+                    id,
+                    pdf_filename,
+                    excel_filename,
+                    accuracy,
+                    matched_count,
+                    mismatches_count,
+                    processing_time,
+                    status,
+                    validated_at
+                FROM validation_history
+                ORDER BY validated_at DESC
+            """)
+        )
+
+        history = []
+
+        for row in result:
+            history.append({
+                "id": row.id,
+                "pdf_filename": row.pdf_filename,
+                "excel_filename": row.excel_filename,
+                "accuracy": row.accuracy,
+                "matched_count": row.matched_count,
+                "mismatches_count": row.mismatches_count,
+                "processing_time": row.processing_time,
+                "status": row.status,
+                "validated_at": row.validated_at
+            })
+
+    return history
+
+@app.get("/validation-history")
+def get_validation_history():
+    # your existing code...
+    
+    return history
+
+
+# Delete a validation history record
+
+@app.delete("/validation-history/{history_id}")
+def delete_validation_history(history_id: int):
+
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                DELETE FROM validation_history
+                WHERE id = :history_id
+            """),
+            {
+                "history_id": history_id
+            }
+        )
+
+        connection.commit()
+
+        if result.rowcount == 0:
+            return {
+                "status": "error",
+                "message": "Validation history record not found"
+            }
+
+    return {
+        "status": "success",
+        "message": "Validation history deleted successfully"
+    }
+
+# Get Detailed Validation Report
+
+@app.get("/validation-history/{history_id}")
+def get_validation_report(history_id: int):
+
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT
+                    id,
+                    pdf_filename,
+                    excel_filename,
+                    accuracy,
+                    matched_count,
+                    mismatches_count,
+                    processing_time,
+                    status,
+                    comparison_results,
+                    validated_at
+                FROM validation_history
+                WHERE id = :history_id
+            """),
+            {
+                "history_id": history_id
+            }
+        ).fetchone()
+
+    if not result:
+        return {
+            "status": "error",
+            "message": "Validation history not found"
+        }
+
+    return {
+        "id": result.id,
+        "pdf_filename": result.pdf_filename,
+        "excel_filename": result.excel_filename,
+        "accuracy": result.accuracy,
+        "matched_count": result.matched_count,
+        "mismatches_count": result.mismatches_count,
+        "processing_time": result.processing_time,
+        "status": result.status,
+        "comparison_results": result.comparison_results,
+        "validated_at": result.validated_at
+    }

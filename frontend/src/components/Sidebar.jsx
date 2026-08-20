@@ -45,9 +45,9 @@ function Sidebar() {
         />
 
         <MenuItem
-          to="/reports"
+          to="/history"
           icon={<FiFileText />}
-          text="Reports"
+          text="Validation History"
         />
 
         <MenuItem

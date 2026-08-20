@@ -9,6 +9,8 @@ import Navbar from "./components/Navbar";
 import DashboardCards from "./components/DashboardCards";
 import UploadSection from "./components/UploadSection";
 import Loading from "./components/Loading";
+import ValidationHistoryPage from "./pages/ValidationHistoryPage";
+import ValidationReportPage from "./pages/ValidationReportPage";
 
 
 
@@ -36,6 +38,8 @@ function App() {
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/history" element={<ValidationHistoryPage />} />
+          <Route path="/history/:id" element={<ValidationReportPage />} />
           </Routes>
         </div>
       </div>
