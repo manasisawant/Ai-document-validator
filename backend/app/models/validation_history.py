@@ -1,29 +1,37 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.sql import func
+
 from app.database.base import Base
 
 
 class ValidationHistory(Base):
-
     __tablename__ = "validation_history"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    pdf_filename = Column(String, nullable=False)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True,
+        index=True
+    )
 
-    excel_filename = Column(String, nullable=False)
+    validation_id = Column(
+        Integer,
+        ForeignKey("validations.id"),
+        nullable=False,
+        index=True
+    )
 
-    accuracy = Column(Float, nullable=False)
+    pdf_filename = Column(String(255), nullable=False)
+    excel_filename = Column(String(255), nullable=False)
 
-    matched_count = Column(Integer, nullable=False)
+    accuracy = Column(Float, nullable=False, default=0.0)
 
-    mismatches_count = Column(Integer, nullable=False)
+    matched_count = Column(Integer, nullable=False, default=0)
+    mismatches_count = Column(Integer, nullable=False, default=0)
 
-    processing_time = Column(String, nullable=False)
-
-    status = Column(String, nullable=False)
-
-    comparison_results = Column(JSON, nullable=True)
+    processing_time = Column(String(50), nullable=True)
 
     validated_at = Column(
         DateTime(timezone=True),
