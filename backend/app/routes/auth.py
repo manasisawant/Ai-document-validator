@@ -3,8 +3,16 @@ from sqlalchemy.orm import Session
 
 from app.database.session import get_db
 from app.models.user import User
-from app.schemas.auth import RegisterRequest, UserResponse
-from app.utils.security import hash_password
+from app.schemas.auth import (
+    RegisterRequest,
+    LoginRequest,
+    UserResponse
+)
+from app.utils.security import (
+    hash_password,
+    verify_password,
+    create_access_token
+)
 
 
 router = APIRouter(
@@ -12,6 +20,10 @@ router = APIRouter(
     tags=["Authentication"]
 )
 
+
+# =========================
+# REGISTER
+# =========================
 
 @router.post(
     "/register",
@@ -47,3 +59,53 @@ def register(
     db.refresh(new_user)
 
     return new_user
+
+
+# =========================
+# LOGIN
+# =========================
+
+@router.post("/login")
+def login(
+    user_data: LoginRequest,
+    db: Session = Depends(get_db)
+):
+    # Find user by email
+    user = (
+        db.query(User)
+        .filter(User.email == user_data.email)
+        .first()
+    )
+
+    # User does not exist
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    # Verify password
+    password_valid = verify_password(
+        user_data.password,
+        user.password_hash
+    )
+
+    # Password is incorrect
+    if not password_valid:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    # Create JWT access token
+    access_token = create_access_token(
+        data={
+            "sub": str(user.id),
+            "email": user.email
+        }
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
