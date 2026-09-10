@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Depends
 
 from app.routes.auth import router as auth_router
+from app.routes.user import router as user_router
+from app.routes.validation import router as validation_router
+from app.routes.history import router as history_router 
 
 from app.models.user import User
 
@@ -15,6 +18,12 @@ app = FastAPI(
 
 # Authentication routes
 app.include_router(auth_router)
+#User routes
+app.include_router(user_router)
+#Validation routes
+app.include_router(validation_router)
+#History routes
+app.include_router(history_router)
 
 
 @app.get("/")

@@ -19,3 +19,15 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class HistoryResponse(BaseModel):
+    validation_id: int
+    pdf_filename: str
+    excel_filename: str
+    accuracy: float
+    matched_count: int
+    mismatches_count: int
+    processing_time: str | None = None
+
+    class Config:
+        from_attributes = True
