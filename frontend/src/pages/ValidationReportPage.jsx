@@ -10,28 +10,148 @@ function ValidationReportPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/validation-history/${id}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch validation report");
+    const fetchReport = async () => {
+      const token = localStorage.getItem("access_token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        /*
+         * First get the validation history.
+         * This contains the summary information.
+         */
+        const historyResponse = await fetch(
+          "http://127.0.0.1:8000/history/",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (historyResponse.status === 401) {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("token_type");
+
+          navigate("/login");
+          return;
         }
 
-        return response.json();
-      })
-      .then((data) => {
-        if (data.status === "error") {
-          throw new Error(data.message);
+        if (!historyResponse.ok) {
+          throw new Error(
+            "Failed to fetch validation history"
+          );
         }
 
-        setReport(data);
+        const historyData = await historyResponse.json();
+
+        /*
+         * Find the requested validation.
+         *
+         * The backend uses validation_id.
+         */
+        const historyItem = historyData.find(
+          (item) =>
+            String(item.validation_id) === String(id)
+        );
+
+        if (!historyItem) {
+          throw new Error(
+            "Validation report was not found."
+          );
+        }
+
+        /*
+         * Now get the detailed comparison results.
+         */
+        const detailsResponse = await fetch(
+          `http://127.0.0.1:8000/history/${id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (detailsResponse.status === 401) {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("token_type");
+
+          navigate("/login");
+          return;
+        }
+
+        if (!detailsResponse.ok) {
+          throw new Error(
+            "Failed to fetch validation details"
+          );
+        }
+
+        const detailsData = await detailsResponse.json();
+
+        /*
+         * Convert backend field names to the format
+         * used by the report UI.
+         */
+        const comparisonResults = Array.isArray(detailsData)
+          ? detailsData.map((result) => ({
+              field:
+                result.field_name ??
+                result.field ??
+                "",
+
+              pdf_value:
+                result.document_value ??
+                result.pdf_value ??
+                "",
+
+              excel_value:
+                result.excel_value ??
+                "",
+
+              status:
+                result.status ??
+                "",
+            }))
+          : [];
+
+        /*
+         * Combine history summary + comparison details.
+         */
+        const combinedReport = {
+          ...historyItem,
+
+          comparison_results: comparisonResults,
+        };
+
+        console.log(
+          "Historical Validation Report:",
+          combinedReport
+        );
+
+        setReport(combinedReport);
+      } catch (error) {
+        console.error(
+          "Historical Report Error:",
+          error
+        );
+
+        setError(
+          error.message ||
+            "Unable to load validation report."
+        );
+      } finally {
         setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setError("Unable to load validation report.");
-        setLoading(false);
-      });
-  }, [id]);
+      }
+    };
+
+    fetchReport();
+  }, [id, navigate]);
 
   if (loading) {
     return (
@@ -44,7 +164,9 @@ function ValidationReportPage() {
   if (error || !report) {
     return (
       <div style={messageStyle}>
-        <h2>{error || "Report not found."}</h2>
+        <h2>
+          {error || "Report not found."}
+        </h2>
 
         <button
           style={buttonStyle}
@@ -56,7 +178,8 @@ function ValidationReportPage() {
     );
   }
 
-  const hasMismatches = report.mismatches_count > 0;
+  const hasMismatches =
+    Number(report.mismatches_count || 0) > 0;
 
   return (
     <div style={pageStyle}>
@@ -65,7 +188,9 @@ function ValidationReportPage() {
 
       <div style={headerStyle}>
         <div>
-          <h1 style={titleStyle}>Validation Report</h1>
+          <h1 style={titleStyle}>
+            Validation Report
+          </h1>
 
           <p style={subtitleStyle}>
             Detailed validation result
@@ -86,23 +211,32 @@ function ValidationReportPage() {
       <div style={documentContainer}>
 
         <div>
-          <p style={labelStyle}>PDF Document</p>
+          <p style={labelStyle}>
+            PDF Document
+          </p>
+
           <p style={filenameStyle}>
             {report.pdf_filename}
           </p>
         </div>
 
         <div>
-          <p style={labelStyle}>Excel Document</p>
+          <p style={labelStyle}>
+            Excel Document
+          </p>
+
           <p style={filenameStyle}>
             {report.excel_filename}
           </p>
         </div>
 
         <div>
-          <p style={labelStyle}>Validated At</p>
+          <p style={labelStyle}>
+            Validation ID
+          </p>
+
           <p style={filenameStyle}>
-            {new Date(report.validated_at).toLocaleString()}
+            #{report.validation_id}
           </p>
         </div>
 
@@ -113,13 +247,17 @@ function ValidationReportPage() {
 
       <div style={cardsContainer}>
 
+        {/* ACCURACY */}
+
         <div
           style={{
             ...cardStyle,
             borderTop: "5px solid #2563eb",
           }}
         >
-          <p style={cardLabel}>Accuracy</p>
+          <p style={cardLabel}>
+            Accuracy
+          </p>
 
           <h2 style={cardValue}>
             {report.accuracy}%
@@ -131,13 +269,17 @@ function ValidationReportPage() {
         </div>
 
 
+        {/* MATCHED */}
+
         <div
           style={{
             ...cardStyle,
             borderTop: "5px solid #059669",
           }}
         >
-          <p style={cardLabel}>Matched</p>
+          <p style={cardLabel}>
+            Matched
+          </p>
 
           <h2 style={cardValue}>
             {report.matched_count}
@@ -149,13 +291,17 @@ function ValidationReportPage() {
         </div>
 
 
+        {/* MISMATCHES */}
+
         <div
           style={{
             ...cardStyle,
             borderTop: "5px solid #dc2626",
           }}
         >
-          <p style={cardLabel}>Mismatches</p>
+          <p style={cardLabel}>
+            Mismatches
+          </p>
 
           <h2 style={cardValue}>
             {report.mismatches_count}
@@ -167,16 +313,20 @@ function ValidationReportPage() {
         </div>
 
 
+        {/* PROCESSING TIME */}
+
         <div
           style={{
             ...cardStyle,
             borderTop: "5px solid #7c3aed",
           }}
         >
-          <p style={cardLabel}>Processing Time</p>
+          <p style={cardLabel}>
+            Processing Time
+          </p>
 
           <h2 style={cardValue}>
-            {report.processing_time}
+            {report.processing_time || "-"}
           </h2>
 
           <p style={cardDescription}>
@@ -244,117 +394,122 @@ function ValidationReportPage() {
           Comparison Details
         </h2>
 
-        <table style={tableStyle}>
+        {report.comparison_results?.length > 0 ? (
+          <table style={tableStyle}>
 
-          <thead>
-            <tr>
+            <thead>
+              <tr>
 
-              <th style={thStyle}>
-                Field
-              </th>
+                <th style={thStyle}>
+                  Field
+                </th>
 
-              <th style={thStyle}>
-                PDF Value
-              </th>
+                <th style={thStyle}>
+                  PDF Value
+                </th>
 
-              <th style={thStyle}>
-                Excel Value
-              </th>
+                <th style={thStyle}>
+                  Excel Value
+                </th>
 
-              <th style={thStyle}>
-                Status
-              </th>
+                <th style={thStyle}>
+                  Status
+                </th>
 
-            </tr>
-          </thead>
+              </tr>
+            </thead>
 
-          <tbody>
+            <tbody>
 
-            {report.comparison_results?.map(
-              (result, index) => (
+              {report.comparison_results.map(
+                (result, index) => {
 
-                <tr
-                  key={index}
-                  style={{
-                    background:
-                      result.status === "Matched"
-                        ? "#ffffff"
-                        : "#fff7f7",
-                  }}
-                >
+                  const isMatched =
+                    String(result.status).toLowerCase() ===
+                    "matched";
 
-                  <td style={tdStyle}>
-                    {result.field}
-                  </td>
-
-                  <td
-                    style={{
-                      ...tdStyle,
-
-                      fontWeight:
-                        result.status === "Matched"
-                          ? "400"
-                          : "700",
-
-                      color:
-                        result.status === "Matched"
-                          ? "#4b5563"
-                          : "#dc2626",
-                    }}
-                  >
-                    {result.pdf_value}
-                  </td>
-
-                  <td
-                    style={{
-                      ...tdStyle,
-
-                      fontWeight:
-                        result.status === "Matched"
-                          ? "400"
-                          : "700",
-
-                      color:
-                        result.status === "Matched"
-                          ? "#4b5563"
-                          : "#dc2626",
-                    }}
-                  >
-                    {result.excel_value}
-                  </td>
-
-                  <td style={tdStyle}>
-
-                    <span
+                  return (
+                    <tr
+                      key={index}
                       style={{
-                        ...statusStyle,
-
-                        background:
-                          result.status === "Matched"
-                            ? "#dcfce7"
-                            : "#fee2e2",
-
-                        color:
-                          result.status === "Matched"
-                            ? "#15803d"
-                            : "#b91c1c",
+                        background: isMatched
+                          ? "#ffffff"
+                          : "#fff7f7",
                       }}
                     >
-                      {result.status === "Matched"
-                        ? "✓ Matched"
-                        : "✕ Mismatch"}
-                    </span>
 
-                  </td>
+                      <td style={tdStyle}>
+                        {result.field}
+                      </td>
 
-                </tr>
+                      <td
+                        style={{
+                          ...tdStyle,
 
-              )
-            )}
+                          fontWeight: isMatched
+                            ? "400"
+                            : "700",
 
-          </tbody>
+                          color: isMatched
+                            ? "#4b5563"
+                            : "#dc2626",
+                        }}
+                      >
+                        {result.pdf_value}
+                      </td>
 
-        </table>
+                      <td
+                        style={{
+                          ...tdStyle,
+
+                          fontWeight: isMatched
+                            ? "400"
+                            : "700",
+
+                          color: isMatched
+                            ? "#4b5563"
+                            : "#dc2626",
+                        }}
+                      >
+                        {result.excel_value}
+                      </td>
+
+                      <td style={tdStyle}>
+
+                        <span
+                          style={{
+                            ...statusStyle,
+
+                            background: isMatched
+                              ? "#dcfce7"
+                              : "#fee2e2",
+
+                            color: isMatched
+                              ? "#15803d"
+                              : "#b91c1c",
+                          }}
+                        >
+                          {isMatched
+                            ? "✓ Matched"
+                            : "✕ Mismatch"}
+                        </span>
+
+                      </td>
+
+                    </tr>
+                  );
+                }
+              )}
+
+            </tbody>
+
+          </table>
+        ) : (
+          <div style={emptyResultsStyle}>
+            No comparison details are available for
+            this validation.
+          </div>
+        )}
 
       </div>
 
@@ -523,11 +678,21 @@ const statusStyle = {
 };
 
 
+/* EMPTY RESULTS */
+
+const emptyResultsStyle = {
+  padding: "40px",
+  textAlign: "center",
+  color: "#6b7280",
+};
+
+
 /* LOADING / ERROR */
 
 const messageStyle = {
   padding: "60px",
   textAlign: "center",
 };
+
 
 export default ValidationReportPage;

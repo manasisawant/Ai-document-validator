@@ -1,273 +1,555 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  FiFileText,
+  FiGrid,
+  FiUploadCloud,
+  FiCheckCircle,
+  FiArrowRight,
+  FiX,
+} from "react-icons/fi";
+
+import "./UploadPage.css";
+
 function UploadPage() {
   const navigate = useNavigate();
 
-  const [pdfFile, setPdFile] = useState(null);
-  const [excelFile , setExcelFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [excelFile, setExcelFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [validationResult, setValidationResult] = useState(null);
-  const handleValidate = async () => {
-  if (!pdfFile || !excelFile) {
-    alert("Please upload both PDF and Excel files.");
-    return;
-  }
 
-  setLoading(true);
-
-  const formData = new FormData();
-  formData.append("pdf_file", pdfFile);
-  formData.append("excel_file", excelFile);
-
-  try {
-  const response = await fetch("http://127.0.0.1:8000/validate", {
-    method: "POST",
-    body: formData,
-  });
-
-  const data = await response.json();
-
-  console.log("Validation Result:",data);
-
-  if(data.status === "success") {
-    navigate("/reports", {
-      state: {
-        validationResult: data,
-      },
-    });
-  }
-
-} catch (error) {
-  console.error("Error:", error);
-} finally {
-  setLoading(false);
-}
-
-};
   const pdfInputRef = useRef(null);
   const excelInputRef = useRef(null);
 
+  const handleValidate = async () => {
+    if (!pdfFile || !excelFile) {
+      alert("Please upload both PDF and Excel files.");
+      return;
+    }
+
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      alert("Please sign in before validating documents.");
+      navigate("/login");
+      return;
+    }
+
+    setLoading(true);
+
+    const formData = new FormData();
+
+    formData.append("pdf_file", pdfFile);
+    formData.append("excel_file", excelFile);
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/validation/upload",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Validation Response:", data);
+
+      /*
+       * Handle API errors
+       */
+      if (!response.ok) {
+        console.error("Validation API Error:", data);
+
+        if (response.status === 401) {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("token_type");
+
+          alert("Your session has expired. Please sign in again.");
+          navigate("/login");
+          return;
+        }
+
+        alert(
+          data.detail ||
+            data.message ||
+            `Validation failed. Server returned ${response.status}.`
+        );
+
+        return;
+      }
+
+      /*
+       * Successful validation
+       *
+       * Backend structure:
+       *
+       * data
+       * ├── message
+       * ├── pdf_filename
+       * ├── excel_filename
+       * └── validation
+       *      ├── accuracy
+       *      ├── matched_count
+       *      ├── mismatches_count
+       *      └── results
+       */
+      if (response.ok && data.validation) {
+        const validation = data.validation;
+
+        /*
+         * Get comparison results from the backend.
+         *
+         * Depending on the backend response, results may
+         * already be called comparison_results or results.
+         */
+        const rawResults =
+          validation.comparison_results ||
+          validation.results ||
+          [];
+
+        /*
+         * Normalize the backend result format so that
+         * ReportsPage always receives the same structure.
+         *
+         * Backend:
+         * document_value
+         *
+         * ReportsPage:
+         * pdf_value
+         */
+        const comparisonResults = rawResults.map((result) => ({
+          field:
+            result.field ??
+            result.field_name ??
+            "",
+
+          pdf_value:
+            result.pdf_value ??
+            result.document_value ??
+            "",
+
+          excel_value:
+            result.excel_value ??
+            "",
+
+          status:
+            result.status ??
+            "",
+        }));
+
+        /*
+         * Create the final report object.
+         */
+        const reportData = {
+          ...validation,
+
+          pdf_filename: data.pdf_filename,
+          excel_filename: data.excel_filename,
+          message: data.message,
+
+          comparison_results: comparisonResults,
+        };
+
+        console.log("Normalized Report Data:", reportData);
+
+        /*
+         * Save the latest validation temporarily.
+         *
+         * ReportsPage can use this if the page is refreshed
+         * during the current browser session.
+         */
+        sessionStorage.setItem(
+          "validationResult",
+          JSON.stringify(reportData)
+        );
+
+        /*
+         * Send the normalized result to ReportsPage.
+         */
+        navigate("/reports", {
+          state: {
+            validationResult: reportData,
+          },
+        });
+
+        return;
+      }
+
+      /*
+       * Fallback if the server responded successfully
+       * but did not return a validation object.
+       */
+      alert(
+        data.message ||
+          data.detail ||
+          "Validation could not be completed."
+      );
+    } catch (error) {
+      console.error("Validation Request Error:", error);
+
+      alert(
+        "Unable to connect to the validation server. Please make sure the backend is running."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removePdf = () => {
+    setPdfFile(null);
+
+    if (pdfInputRef.current) {
+      pdfInputRef.current.value = "";
+    }
+  };
+
+  const removeExcel = () => {
+    setExcelFile(null);
+
+    if (excelInputRef.current) {
+      excelInputRef.current.value = "";
+    }
+  };
+
   return (
-    <div style={{ width: "100%" }}>
-      <h1
-        style={{
-          fontSize: "38px",
-          fontWeight: "700",
-          color: "#111827",
-          marginBottom: "8px",
-        }}
-      >
-        Upload Documents
-      </h1>
+    <div className="upload-page">
 
-      <p
-        style={{
-          color: "#6b7280",
-          fontSize: "16px",
-          marginBottom: "35px",
-        }}
-      >
-        Upload your PDF and Excel files for validation.
-      </p>
+      {/* PAGE HEADER */}
+      <div className="upload-page-header">
+        <div>
+          <div className="upload-eyebrow">
+            VALIDATION WORKSPACE
+          </div>
 
-      <div
-        style={{
-          width: "100%",
-          background: "#ffffff",
-          borderRadius: "18px",
-          padding: "35px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-          boxSizing: "border-box",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "30px",
-            marginBottom: "35px",
-          }}
-        >
-          {/* PDF CARD */}
-          <div style={cardStyle}>
-            <div style={iconStyle}>📄</div>
+          <h1>New Validation</h1>
 
-            <h2 style={cardTitle}>PDF Document</h2>
+          <p>
+            Upload your source document and reference spreadsheet
+            to compare their data automatically.
+          </p>
+        </div>
+      </div>
 
-            <p style={cardDescription}>
-              Upload the scanned PDF document.
+      {/* UPLOAD WORKSPACE */}
+      <div className="upload-workspace">
+
+        <div className="upload-workspace-header">
+          <div>
+            <h2>Upload documents</h2>
+
+            <p>
+              Both files are required before validation can begin.
             </p>
+          </div>
 
-            <button
-              style={pdfButtonStyle}
-              onMouseOver={(e) => {
-                e.target.style.background = "#1d4ed8";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.background = "#2563eb";
-              }}
-              onClick={() => pdfInputRef.current.click()}
-            >
-              Upload PDF
-            </button>
+          <div className="validation-status">
+            <span className="status-dot" />
+            Ready for upload
+          </div>
+        </div>
+
+        <div className="upload-cards">
+
+          {/* PDF CARD */}
+
+          <div
+            className={`upload-card ${
+              pdfFile ? "upload-card-complete" : ""
+            }`}
+          >
+            <div className="upload-card-top">
+
+              <div className="upload-file-icon pdf-icon">
+                <FiFileText />
+              </div>
+
+              {pdfFile && (
+                <div className="upload-complete">
+                  <FiCheckCircle />
+                </div>
+              )}
+            </div>
+
+            <div className="upload-card-content">
+
+              <div className="upload-card-label">
+                SOURCE DOCUMENT
+              </div>
+
+              <h3>PDF Document</h3>
+
+              <p>
+                Upload the PDF document that needs to be
+                validated.
+              </p>
+            </div>
+
+            {pdfFile ? (
+              <div className="selected-file">
+
+                <div className="selected-file-info">
+
+                  <FiFileText />
+
+                  <div>
+                    <strong>{pdfFile.name}</strong>
+
+                    <span>
+                      PDF document selected
+                    </span>
+                  </div>
+
+                </div>
+
+                <button
+                  type="button"
+                  className="remove-file"
+                  onClick={removePdf}
+                  aria-label="Remove PDF"
+                >
+                  <FiX />
+                </button>
+
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="upload-file-button upload-pdf-button"
+                onClick={() => pdfInputRef.current?.click()}
+              >
+                <FiUploadCloud />
+                Choose PDF
+              </button>
+            )}
 
             <input
-            ref={pdfInputRef}
-            type="file"
-            accept=".pdf"
-            style={{ display: "none "}}
-            onChange={(e) => {
-              setPdFile(e.target.files[0]);
-            }}
+              ref={pdfInputRef}
+              type="file"
+              accept=".pdf"
+              hidden
+              onChange={(e) => {
+                setPdfFile(
+                  e.target.files?.[0] || null
+                );
+              }}
             />
-            {pdfFile && (
-  <p
-    style={{
-      marginTop: "15px",
-      color: "#2563eb",
-      fontWeight: "600",
-    }}
-  >
-    📄 {pdfFile.name}
-  </p>
-)}
+
+            <div className="upload-format">
+              PDF files only
+            </div>
+
           </div>
 
           {/* EXCEL CARD */}
-          <div style={cardStyle}>
-            <div style={iconStyle}>📊</div>
 
-            <h2 style={cardTitle}>Excel Document</h2>
+          <div
+            className={`upload-card ${
+              excelFile ? "upload-card-complete" : ""
+            }`}
+          >
 
-            <p style={cardDescription}>
-              Upload the Excel sheet.
-            </p>
+            <div className="upload-card-top">
 
-            <button
-              style={excelButtonStyle}
-              onClick={() => excelInputRef.current.click()}
-              onMouseOver={(e) => {
-                e.target.style.background = "#047857";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.background = "#059669";
-              }}
-            >
-              Upload Excel
+              <div className="upload-file-icon excel-icon">
+                <FiGrid />
+              </div>
 
-              <input
+              {excelFile && (
+                <div className="upload-complete">
+                  <FiCheckCircle />
+                </div>
+              )}
+
+            </div>
+
+            <div className="upload-card-content">
+
+              <div className="upload-card-label">
+                REFERENCE DATA
+              </div>
+
+              <h3>Excel Spreadsheet</h3>
+
+              <p>
+                Upload the Excel file containing the reference
+                values for comparison.
+              </p>
+
+            </div>
+
+            {excelFile ? (
+              <div className="selected-file">
+
+                <div className="selected-file-info">
+
+                  <FiGrid />
+
+                  <div>
+                    <strong>{excelFile.name}</strong>
+
+                    <span>
+                      Excel spreadsheet selected
+                    </span>
+                  </div>
+
+                </div>
+
+                <button
+                  type="button"
+                  className="remove-file"
+                  onClick={removeExcel}
+                  aria-label="Remove Excel"
+                >
+                  <FiX />
+                </button>
+
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="upload-file-button upload-excel-button"
+                onClick={() =>
+                  excelInputRef.current?.click()
+                }
+              >
+                <FiUploadCloud />
+                Choose Excel
+              </button>
+            )}
+
+            <input
               ref={excelInputRef}
               type="file"
               accept=".xlsx,.xls"
-              style={{ display: "none"}}
+              hidden
               onChange={(e) => {
-                setExcelFile(e.target.files[0]);
+                setExcelFile(
+                  e.target.files?.[0] || null
+                );
               }}
-              />
-              {excelFile && (
-  <p
-    style={{
-      marginTop: "15px",
-      color: "#f3f4fa",
-      fontWeight: "600",
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      maxWidth: "220px",
-      marginLeft: "auto",
-      marginRight: "auto",
-    }}
-  >
-    📊 {excelFile.name}
-  </p>
-)}
-            </button>
+            />
+
+            <div className="upload-format">
+              XLSX or XLS files
+            </div>
+
           </div>
+
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
+        {/* VALIDATION ACTION */}
+
+        <div className="validation-action">
+
+          <div className="validation-action-info">
+
+            <div className="validation-action-icon">
+              <FiCheckCircle />
+            </div>
+
+            <div>
+              <strong>
+                Ready to validate?
+              </strong>
+
+              <span>
+                Upload both files to start the comparison.
+              </span>
+            </div>
+
+          </div>
+
           <button
-            style={{
-  ...validateButtonStyle,
-  background: !pdfFile || !excelFile ? "#9ca3af" : "#111827",
-  cursor: !pdfFile || !excelFile ? "not-allowed" : "pointer",
-}}
-            disabled={!pdfFile || !excelFile}
+            type="button"
+            className={`validate-button ${
+              !pdfFile || !excelFile || loading
+                ? "validate-button-disabled"
+                : ""
+            }`}
+            disabled={
+              !pdfFile ||
+              !excelFile ||
+              loading
+            }
             onClick={handleValidate}
-            onMouseOver={(e) => {
-              e.target.style.background = "#1f2937";
-            }}
-            onMouseOut={(e) => {
-              e.target.style.background = "#111827";
-            }}
           >
-            Validate Documents
+
+            {loading ? (
+              <>
+                <span className="validation-spinner" />
+                Validating...
+              </>
+            ) : (
+              <>
+                Validate Documents
+                <FiArrowRight />
+              </>
+            )}
+
           </button>
+
         </div>
+
       </div>
+
+      {/* PROCESS */}
+
+      <div className="upload-process">
+
+        <div className="process-step">
+
+          <span>01</span>
+
+          <div>
+            <strong>Upload documents</strong>
+
+            <p>
+              Provide the PDF and reference Excel file.
+            </p>
+          </div>
+
+        </div>
+
+        <div className="process-line" />
+
+        <div className="process-step">
+
+          <span>02</span>
+
+          <div>
+            <strong>AI validation</strong>
+
+            <p>
+              DocuVerify extracts and compares the data.
+            </p>
+          </div>
+
+        </div>
+
+        <div className="process-line" />
+
+        <div className="process-step">
+
+          <span>03</span>
+
+          <div>
+            <strong>Review results</strong>
+
+            <p>
+              Inspect matches and discrepancies in the report.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }
-
-
-
-const cardStyle = {
-  flex: 1,
-  background: "#f8fafc",
-  borderRadius: "16px",
-  padding: "35px",
-  textAlign: "center",
-  border: "1px solid #e5e7eb",
-  minHeight: "320px",
-};
-
-const iconStyle = {
-  fontSize: "48px",
-  marginBottom: "18px",
-};
-
-const cardTitle = {
-  fontSize: "24px",
-  color: "#1f2937",
-  marginBottom: "10px",
-};
-
-const cardDescription = {
-  color: "#6b7280",
-  marginBottom: "25px",
-  fontSize: "15px",
-};
-
-const baseButtonStyle = {
-  color: "white",
-  border: "none",
-  borderRadius: "10px",
-  padding: "14px 28px",
-  fontSize: "16px",
-  fontWeight: "600",
-  cursor: "pointer",
-  transition: "0.3s",
-};
-
-const pdfButtonStyle = {
-  ...baseButtonStyle,
-  background: "#2563eb",
-};
-
-const excelButtonStyle = {
-  ...baseButtonStyle,
-  background: "#059669",
-};
-
-const validateButtonStyle = {
-  ...baseButtonStyle,
-  background: "#111827",
-  padding: "16px 42px",
-  fontSize: "17px",
-};
 
 export default UploadPage;

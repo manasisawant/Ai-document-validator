@@ -1,49 +1,100 @@
-import { Routes,Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
+// Public pages
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+
+// Application pages
 import DashboardPage from "./pages/DashboardPage";
 import UploadPage from "./pages/UploadPage";
 import ReportsPage from "./pages/ReportsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import Sidebar from "./components/Sidebar";
-import Navbar from "./components/Navbar";
-import DashboardCards from "./components/DashboardCards";
-import UploadSection from "./components/UploadSection";
-import Loading from "./components/Loading";
 import ValidationHistoryPage from "./pages/ValidationHistoryPage";
 import ValidationReportPage from "./pages/ValidationReportPage";
+import ProfilePage from "./pages/ProfilePage";
 
+import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
 
+import "./DashboardLayout.css";
+
+function DashboardLayout() {
+  return (
+    <div className="dashboard-layout">
+      <Sidebar />
+
+      <div className="dashboard-main">
+        <Navbar />
+
+        <main className="dashboard-content">
+          <Routes>
+            <Route
+              path="/dashboard"
+              element={<DashboardPage />}
+            />
+
+            <Route
+              path="/upload"
+              element={<UploadPage />}
+            />
+
+            <Route
+              path="/reports"
+              element={<ReportsPage />}
+            />
+
+            <Route
+              path="/analytics"
+              element={<AnalyticsPage />}
+            />
+
+            <Route
+              path="/history"
+              element={<ValidationHistoryPage />}
+            />
+
+            <Route
+              path="/history/:id"
+              element={<ValidationReportPage />}
+            />
+
+            <Route
+              path="/profile"
+              element={<ProfilePage />}
+            />
+          </Routes>
+        </main>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   return (
-    <div
-      style={{
-        display: "flex",
-        background: "linear-gradient(135deg, #d8e6f7, #edf3fb, #dce7f5)",
-        minHeight: "100vh",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        backgroundImage: "radial-gradient(circle at top right, rgba(255,255,255,0.3), transparent 35%)",
-      }}
-    >
-      <Sidebar />
+    <Routes>
+      {/* Public pages */}
+      <Route
+        path="/"
+        element={<HomePage />}
+      />
 
-      <div style={{ flex: 1 }}>
-        <Navbar />
-       
-        <div style={{ padding: "45px"}}>
-          <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/upload" element={<UploadPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/history" element={<ValidationHistoryPage />} />
-          <Route path="/history/:id" element={<ValidationReportPage />} />
-          </Routes>
-        </div>
-      </div>
-    </div>
+      <Route
+        path="/login"
+        element={<LoginPage />}
+      />
+
+      <Route
+        path="/register"
+        element={<RegisterPage />}
+      />
+
+      {/* Application */}
+      <Route
+        path="/*"
+        element={<DashboardLayout />}
+      />
+    </Routes>
   );
 }
 

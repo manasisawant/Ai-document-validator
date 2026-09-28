@@ -3,6 +3,8 @@ from app.models.validation_result import ValidationResult
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
+import time
+
 from app.database.session import get_db
 from app.models.validation import Validation
 
@@ -22,7 +24,7 @@ from app.utils.dependencies import get_current_user
 router = APIRouter(
     prefix="/validation",
     tags=["Validation"]
-) 
+)
 
 
 @router.post("/upload")
@@ -32,6 +34,9 @@ def upload_and_validate(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    # Start processing timer
+    start_time = time.perf_counter()
+
     # Check PDF
     if not pdf_file.filename.lower().endswith(".pdf"):
         raise HTTPException(
@@ -47,16 +52,15 @@ def upload_and_validate(
         )
 
     validation = Validation(
-    user_id=current_user.id,
-    pdf_filename=pdf_file.filename,
-    excel_filename=excel_file.filename,
-    status="processing"
+        user_id=current_user.id,
+        pdf_filename=pdf_file.filename,
+        excel_filename=excel_file.filename,
+        status="processing"
     )
-    
+
     db.add(validation)
     db.commit()
     db.refresh(validation)
-
 
     # Save PDF
     pdf_path = PDF_UPLOAD_DIR / Path(pdf_file.filename).name
@@ -85,6 +89,14 @@ def upload_and_validate(
         excel_fields
     )
 
+    # Calculate processing time
+    processing_seconds = time.perf_counter() - start_time
+    processing_time = f"{processing_seconds:.2f}s"
+
+    # Add processing time to the validation response
+    validation_result["processing_time"] = processing_time
+
+    # Save individual comparison results
     for result in validation_result["results"]:
         validation_result_record = ValidationResult(
             validation_id=validation.id,
@@ -96,10 +108,11 @@ def upload_and_validate(
 
         db.add(validation_result_record)
 
-    #Mark validation as completed 
+    # Mark validation as completed
     validation.status = "completed"
     validation.completed_at = datetime.now(timezone.utc)
 
+    # Save validation history
     history = ValidationHistory(
         user_id=current_user.id,
         validation_id=validation.id,
@@ -108,11 +121,10 @@ def upload_and_validate(
         accuracy=validation_result["accuracy"],
         matched_count=validation_result["matched_count"],
         mismatches_count=validation_result["mismatches_count"],
-        processing_time=None
+        processing_time=processing_time
     )
 
     db.add(history)
-
 
     db.commit()
     db.refresh(validation)

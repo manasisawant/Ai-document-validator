@@ -1,0 +1,897 @@
+/* =====================================
+   DOCUVERIFY — REPORTS
+===================================== */
+
+.reports-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+
+  color: #0f172a;
+}
+
+
+/* =====================================
+   COMMON
+===================================== */
+
+.report-eyebrow {
+  margin-bottom: 8px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 1.25px;
+}
+
+
+/* =====================================
+   HEADER
+===================================== */
+
+.reports-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 24px;
+}
+
+.reports-header-left {
+  min-width: 0;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin-bottom: 18px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.back-button:hover {
+  color: #2563eb;
+}
+
+.back-button svg {
+  font-size: 12px;
+}
+
+.reports-header h1 {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 30px;
+  line-height: 1.2;
+
+  font-weight: 700;
+
+  letter-spacing: -0.7px;
+}
+
+.reports-header p {
+  max-width: 650px;
+
+  margin: 9px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+
+/* =====================================
+   HEADER ACTIONS
+===================================== */
+
+.reports-header-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+.report-download-button,
+.report-new-button {
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 14px;
+
+  border-radius: 6px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.report-download-button {
+  border: 1px solid #2563eb;
+
+  background: #2563eb;
+
+  color: #ffffff;
+}
+
+.report-download-button:hover {
+  background: #1d4ed8;
+
+  border-color: #1d4ed8;
+}
+
+.report-new-button {
+  border: 1px solid #dbe3ee;
+
+  background: #ffffff;
+
+  color: #334155;
+}
+
+.report-new-button:hover {
+  border-color: #2563eb;
+
+  color: #2563eb;
+
+  background: #f8fbff;
+}
+
+.report-download-button svg,
+.report-new-button svg {
+  font-size: 14px;
+}
+
+
+/* =====================================
+   VALIDATION STATUS
+===================================== */
+
+.validation-result-banner {
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 18px;
+
+  padding: 0 18px;
+
+  box-sizing: border-box;
+
+  border-radius: 8px;
+}
+
+.validation-success {
+  background: #f0fdf4;
+
+  border: 1px solid #bbf7d0;
+}
+
+.validation-warning {
+  background: #fff7ed;
+
+  border: 1px solid #fed7aa;
+}
+
+.validation-result-icon {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 7px;
+
+  font-size: 17px;
+}
+
+.validation-success .validation-result-icon {
+  background: #dcfce7;
+
+  color: #15803d;
+}
+
+.validation-warning .validation-result-icon {
+  background: #ffedd5;
+
+  color: #c2410c;
+}
+
+.validation-result-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.validation-result-content strong {
+  font-size: 12px;
+
+  font-weight: 650;
+}
+
+.validation-result-content span {
+  margin-top: 4px;
+
+  color: #64748b;
+
+  font-size: 10px;
+}
+
+
+/* =====================================
+   SUMMARY CARDS
+===================================== */
+
+.report-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 14px;
+
+  margin-bottom: 24px;
+}
+
+.report-summary-card {
+  min-height: 136px;
+
+  padding: 18px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 9px;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.report-summary-card:hover {
+  border-color: #d3dce8;
+
+  box-shadow:
+    0 5px 18px rgba(15, 23, 42, 0.04);
+}
+
+.summary-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.summary-icon {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  font-size: 14px;
+}
+
+.summary-icon.blue {
+  background: #eff6ff;
+
+  color: #2563eb;
+}
+
+.summary-icon.green {
+  background: #ecfdf5;
+
+  color: #059669;
+}
+
+.summary-icon.orange {
+  background: #fff7ed;
+
+  color: #ea580c;
+}
+
+.summary-icon.purple {
+  background: #f5f3ff;
+
+  color: #7c3aed;
+}
+
+.report-summary-card > strong {
+  display: block;
+
+  margin-top: 16px;
+
+  color: #0f172a;
+
+  font-size: 27px;
+  line-height: 1;
+
+  font-weight: 700;
+}
+
+.report-summary-card > strong.processing-value {
+  font-size: 20px;
+}
+
+.report-summary-card > small {
+  display: block;
+
+  margin-top: 9px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+}
+
+
+/* =====================================
+   COMPARISON SECTION
+===================================== */
+
+.comparison-section {
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 9px;
+
+  overflow: hidden;
+
+  margin-bottom: 18px;
+}
+
+.comparison-header {
+  min-height: 92px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 0 22px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #eef2f6;
+}
+
+.comparison-header .report-eyebrow {
+  margin-bottom: 6px;
+}
+
+.comparison-header h2 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 17px;
+
+  font-weight: 650;
+}
+
+.comparison-header p {
+  margin: 5px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+}
+
+.comparison-count {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+
+  padding: 7px 10px;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 6px;
+
+  background: #f8fafc;
+
+  color: #64748b;
+
+  font-size: 9px;
+
+  font-weight: 600;
+}
+
+.comparison-count svg {
+  font-size: 12px;
+}
+
+
+/* =====================================
+   TABLE
+===================================== */
+
+.comparison-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+.comparison-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  table-layout: fixed;
+}
+
+.comparison-table th {
+  height: 46px;
+
+  padding: 0 18px;
+
+  box-sizing: border-box;
+
+  background: #f8fafc;
+
+  color: #64748b;
+
+  text-align: left;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.3px;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.comparison-table th:nth-child(1) {
+  width: 20%;
+}
+
+.comparison-table th:nth-child(2) {
+  width: 29%;
+}
+
+.comparison-table th:nth-child(3) {
+  width: 29%;
+}
+
+.comparison-table th:nth-child(4) {
+  width: 22%;
+}
+
+.comparison-table td {
+  min-height: 52px;
+
+  padding: 14px 18px;
+
+  box-sizing: border-box;
+
+  color: #475569;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+
+  border-bottom: 1px solid #eef2f6;
+
+  vertical-align: middle;
+
+  word-break: break-word;
+}
+
+.comparison-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.comparison-table tbody tr {
+  background: #ffffff;
+
+  transition:
+    background-color 0.12s ease;
+}
+
+.comparison-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.comparison-table tbody tr.mismatch-row {
+  background: #fffaf9;
+}
+
+.comparison-table tbody tr.mismatch-row:hover {
+  background: #fff7f5;
+}
+
+.field-cell {
+  color: #1e293b !important;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.value-cell {
+  color: #475569;
+}
+
+.mismatch-value {
+  color: #b91c1c !important;
+
+  font-weight: 600;
+}
+
+
+/* =====================================
+   STATUS BADGES
+===================================== */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  min-height: 26px;
+
+  padding: 0 9px;
+
+  box-sizing: border-box;
+
+  border-radius: 6px;
+
+  font-size: 9px;
+
+  font-weight: 650;
+
+  white-space: nowrap;
+}
+
+.status-badge svg {
+  font-size: 12px;
+}
+
+.status-matched {
+  background: #ecfdf5;
+
+  color: #047857;
+}
+
+.status-mismatch {
+  background: #fef2f2;
+
+  color: #b91c1c;
+}
+
+
+/* =====================================
+   FOOTER ACTION
+===================================== */
+
+.report-footer-action {
+  min-height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 0 20px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 9px;
+}
+
+.report-footer-action > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.report-footer-action strong {
+  color: #334155;
+
+  font-size: 11px;
+
+  font-weight: 650;
+}
+
+.report-footer-action span {
+  margin-top: 4px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+}
+
+.footer-new-validation {
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 13px;
+
+  border: 1px solid #dbe3ee;
+
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  color: #334155;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.footer-new-validation:hover {
+  border-color: #2563eb;
+
+  color: #2563eb;
+
+  background: #f8fbff;
+}
+
+.footer-new-validation svg {
+  font-size: 12px;
+}
+
+
+/* =====================================
+   EMPTY REPORT
+===================================== */
+
+.report-empty-page {
+  min-height: 500px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+}
+
+.report-empty-card {
+  width: 100%;
+  max-width: 480px;
+
+  padding: 42px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 10px;
+
+  text-align: center;
+}
+
+.report-empty-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 18px;
+
+  border-radius: 9px;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+  font-size: 21px;
+}
+
+.report-empty-card .report-eyebrow {
+  margin-bottom: 7px;
+}
+
+.report-empty-card h1 {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 22px;
+
+  font-weight: 700;
+}
+
+.report-empty-card p {
+  margin: 9px auto 20px;
+
+  max-width: 350px;
+
+  color: #64748b;
+
+  font-size: 11px;
+
+  line-height: 1.65;
+}
+
+.report-primary-button {
+  height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 14px;
+
+  border: 0;
+
+  border-radius: 6px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.report-primary-button:hover {
+  background: #1d4ed8;
+}
+
+.report-primary-button svg {
+  font-size: 13px;
+}
+
+
+/* =====================================
+   RESPONSIVE — TABLET
+===================================== */
+
+@media (max-width: 950px) {
+
+  .report-summary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .reports-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .reports-header-actions {
+    width: 100%;
+  }
+
+  .report-download-button,
+  .report-new-button {
+    flex: 1;
+  }
+}
+
+
+/* =====================================
+   RESPONSIVE — MOBILE
+===================================== */
+
+@media (max-width: 650px) {
+
+  .reports-header h1 {
+    font-size: 25px;
+  }
+
+  .reports-header p {
+    font-size: 12px;
+  }
+
+  .reports-header-actions {
+    flex-direction: column;
+  }
+
+  .report-download-button,
+  .report-new-button {
+    width: 100%;
+  }
+
+  .report-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    padding: 18px;
+  }
+
+  .comparison-count {
+    align-self: flex-start;
+  }
+
+  .comparison-table {
+    min-width: 700px;
+  }
+
+  .report-footer-action {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    padding: 18px;
+  }
+
+  .footer-new-validation {
+    width: 100%;
+  }
+}

@@ -1,0 +1,755 @@
+/* =====================================
+   DOCUVERIFY — NEW VALIDATION
+===================================== */
+
+.upload-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+
+  color: #0f172a;
+}
+
+
+/* =====================================
+   PAGE HEADER
+===================================== */
+
+.upload-page-header {
+  margin-bottom: 30px;
+}
+
+.upload-eyebrow {
+  margin-bottom: 8px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 1.25px;
+}
+
+.upload-page-header h1 {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 30px;
+  line-height: 1.2;
+
+  font-weight: 700;
+
+  letter-spacing: -0.7px;
+}
+
+.upload-page-header p {
+  max-width: 680px;
+
+  margin: 9px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* =====================================
+   MAIN WORKSPACE
+===================================== */
+
+.upload-workspace {
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 9px;
+
+  overflow: hidden;
+}
+
+
+/* =====================================
+   WORKSPACE HEADER
+===================================== */
+
+.upload-workspace-header {
+  min-height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 0 24px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #eef2f6;
+}
+
+.upload-workspace-header h2 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.upload-workspace-header p {
+  margin: 6px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+.validation-status {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #22c55e;
+}
+
+
+/* =====================================
+   UPLOAD CARDS
+===================================== */
+
+.upload-cards {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+}
+
+.upload-card {
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 8px;
+
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.upload-card:hover {
+  border-color: #cbd5e1;
+}
+
+.upload-card-complete {
+  background: #fbfdff;
+
+  border-color: #bfdbfe;
+}
+
+
+/* =====================================
+   CARD TOP
+===================================== */
+
+.upload-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.upload-file-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  font-size: 18px;
+}
+
+.pdf-icon {
+  background: #eff6ff;
+
+  color: #2563eb;
+}
+
+.excel-icon {
+  background: #ecfdf5;
+
+  color: #059669;
+}
+
+.upload-complete {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #059669;
+
+  font-size: 16px;
+}
+
+
+/* =====================================
+   CARD CONTENT
+===================================== */
+
+.upload-card-content {
+  margin-top: 24px;
+}
+
+.upload-card-label {
+  margin-bottom: 7px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 1.05px;
+}
+
+.upload-card-content h3 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 18px;
+  font-weight: 650;
+
+  letter-spacing: -0.2px;
+}
+
+.upload-card-content p {
+  max-width: 390px;
+
+  margin: 9px 0 0;
+
+  color: #64748b;
+
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+
+/* =====================================
+   UPLOAD BUTTON
+===================================== */
+
+.upload-file-button {
+  width: 100%;
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin-top: auto;
+
+  border-radius: 6px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.upload-file-button svg {
+  font-size: 14px;
+}
+
+.upload-pdf-button {
+  border: 1px solid #bfdbfe;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+}
+
+.upload-pdf-button:hover {
+  background: #dbeafe;
+
+  border-color: #93c5fd;
+}
+
+.upload-excel-button {
+  border: 1px solid #a7f3d0;
+
+  background: #ecfdf5;
+
+  color: #047857;
+}
+
+.upload-excel-button:hover {
+  background: #d1fae5;
+
+  border-color: #6ee7b7;
+}
+
+
+/* =====================================
+   SELECTED FILE
+===================================== */
+
+.selected-file {
+  min-height: 56px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-top: auto;
+
+  padding: 9px 11px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe3ee;
+
+  border-radius: 6px;
+}
+
+.selected-file-info {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  color: #2563eb;
+}
+
+.selected-file-info > svg {
+  flex-shrink: 0;
+
+  font-size: 15px;
+}
+
+.selected-file-info div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-file-info strong {
+  overflow: hidden;
+
+  color: #334155;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+.selected-file-info span {
+  margin-top: 3px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+}
+
+.remove-file {
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #94a3b8;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.remove-file:hover {
+  background: #fef2f2;
+
+  color: #dc2626;
+}
+
+
+/* =====================================
+   FILE FORMAT TEXT
+===================================== */
+
+.upload-format {
+  margin-top: 9px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+}
+
+
+/* =====================================
+   VALIDATION ACTION
+===================================== */
+
+.validation-action {
+  min-height: 82px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 0 24px;
+
+  box-sizing: border-box;
+
+  border-top: 1px solid #eef2f6;
+}
+
+.validation-action-info {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.validation-action-icon {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 7px;
+
+  background: #f1f5f9;
+
+  color: #64748b;
+
+  font-size: 15px;
+}
+
+.validation-action-info div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.validation-action-info strong {
+  color: #334155;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.validation-action-info span {
+  margin-top: 4px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+}
+
+
+/* =====================================
+   VALIDATE BUTTON
+===================================== */
+
+.validate-button {
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 17px;
+
+  border: 0;
+
+  border-radius: 6px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.validate-button:hover:not(:disabled) {
+  background: #1d4ed8;
+
+  transform: translateY(-1px);
+}
+
+.validate-button svg {
+  font-size: 14px;
+}
+
+.validate-button-disabled {
+  background: #cbd5e1;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* =====================================
+   VALIDATION LOADING SPINNER
+===================================== */
+
+.validation-spinner {
+  width: 12px;
+  height: 12px;
+
+  border: 2px solid rgba(255, 255, 255, 0.4);
+
+  border-top-color: #ffffff;
+
+  border-radius: 50%;
+
+  animation: validation-spin 0.7s linear infinite;
+}
+
+@keyframes validation-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =====================================
+   PROCESS STRIP
+===================================== */
+
+.upload-process {
+  min-height: 88px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  margin-top: 18px;
+
+  padding: 0 24px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 9px;
+}
+
+.process-step {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  flex: 1;
+}
+
+.process-step > span {
+  width: 29px;
+  height: 29px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 6px;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.process-step div {
+  min-width: 0;
+}
+
+.process-step strong {
+  display: block;
+
+  color: #334155;
+
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.process-step p {
+  margin: 4px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+
+  line-height: 1.5;
+}
+
+.process-line {
+  width: 28px;
+  height: 1px;
+
+  flex-shrink: 0;
+
+  background: #e2e8f0;
+}
+
+
+/* =====================================
+   RESPONSIVE — TABLET
+===================================== */
+
+@media (max-width: 850px) {
+
+  .upload-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .upload-card {
+    min-height: 280px;
+  }
+
+  .upload-process {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    padding: 18px;
+  }
+
+  .process-step {
+    width: 100%;
+  }
+
+  .process-line {
+    display: none;
+  }
+}
+
+
+/* =====================================
+   RESPONSIVE — MOBILE
+===================================== */
+
+@media (max-width: 600px) {
+
+  .upload-page-header h1 {
+    font-size: 25px;
+  }
+
+  .upload-page-header p {
+    font-size: 12px;
+  }
+
+  .upload-workspace-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    padding: 18px;
+  }
+
+  .upload-cards {
+    padding: 16px;
+  }
+
+  .validation-action {
+    align-items: stretch;
+
+    flex-direction: column;
+
+    padding: 16px 18px;
+  }
+
+  .validate-button {
+    width: 100%;
+  }
+}
